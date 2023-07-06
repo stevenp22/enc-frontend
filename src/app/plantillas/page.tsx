@@ -37,6 +37,7 @@ import DeleteModal from "@/components/DeleteModal";
 import SearchBox from "@/components/SearchBox";
 import Link from "next/link";
 import { Add, Edit } from "@mui/icons-material";
+import { normalize } from "@/components/Utils";
 
 function TablePaginationActions(props: any) {
   const theme = useTheme();
@@ -114,7 +115,7 @@ const Plantillas = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRow, setSelectedRow] = useState({
-    id: "",
+    _id: "",
   });
   const [open, setOpen] = useState(false);
   //const router = useRouter();
@@ -141,6 +142,7 @@ const Plantillas = () => {
   useEffect(() => {
     setLoading(false);
     getPlantillas();
+    console.log(data);
   }, []);
 
   const handleModal = () => {
@@ -153,13 +155,30 @@ const Plantillas = () => {
 
   const onDelete = async () => {
     try {
-      await deletePlantillaRequest(selectedRow.id);
+      await deletePlantillaRequest(selectedRow._id);
       setOpen(false);
       getPlantillas();
     } catch (e) {
       // console.log(e);
     }
   };
+
+  interface plantillaInterface {
+    _id?: string,
+    nombre?: string,
+    empresa?: string,
+  }
+
+  useEffect(() => {
+    let temp = [];
+    let input = normalize(value);
+    temp = data.filter(
+      (element: plantillaInterface) =>
+        normalize(element.nombre.toLowerCase()).includes(input.toLowerCase()) ||
+        normalize(element.empresa.toLowerCase()).includes(input.toLowerCase())
+    );
+    setFilteredData(temp);
+  }, [data, value]);
 
   return (
     <Grid container spacing={3}>
@@ -202,7 +221,9 @@ const Plantillas = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell align="center">
-                        <Typography sx={{ fontSize: "20px" }}>nombre</Typography>
+                        <Typography sx={{ fontSize: "20px" }}>
+                          nombre
+                        </Typography>
                       </TableCell>
                       <TableCell align="center">
                         <Typography sx={{ fontSize: "20px" }}>
@@ -223,9 +244,9 @@ const Plantillas = () => {
                           page * rowsPerPage + rowsPerPage
                         )
                       : filteredData
-                    ).map((row) => (
+                    ).map((row: plantillaInterface) => (
                       <TableRow
-                        key={row.id}
+                        key={row._id}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
@@ -236,21 +257,21 @@ const Plantillas = () => {
                         <TableCell align="center" component="th" scope="row">
                           {row.empresa}
                         </TableCell>
-                          <TableCell sx={{ width: "170px" }} align="center">
-                            <Tooltip title="Editar">
-                              <MuiLink>
-                                <Button
-                                  onClick={() =>
-                                    router.push({
-                                      pathname: `plantilla/${row.id}/editar`,
-                                    })
-                                  }
-                                >
-                                  <Edit sx={{ color: "#ffc327" }} />
-                                </Button>
-                              </MuiLink>
-                            </Tooltip>
-                          </TableCell>
+                        <TableCell sx={{ width: "170px" }} align="center">
+                          <Tooltip title="Editar">
+                            <MuiLink>
+                              <Button
+                                onClick={() =>
+                                  router.push({
+                                    pathname: `plantilla/${row._id}/editar`,
+                                  })
+                                }
+                              >
+                                <Edit sx={{ color: "#ffc327" }} />
+                              </Button>
+                            </MuiLink>
+                          </Tooltip>
+                        </TableCell>
                       </TableRow>
                     ))}
                     {emptyRows > 0 && (
