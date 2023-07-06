@@ -105,3 +105,9 @@ a {
     color-scheme: dark;
   }
 }
+
+.css-dmmspl-MuiFormGroup-root {
+  width: 100%;
+  flex-direction: initial;
+  margin: 0 auto;
+}
