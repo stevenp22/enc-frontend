@@ -25,7 +25,7 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import PropTypes, { element } from "prop-types";
 import { useTheme } from "@mui/material/styles";
-import Crear from "./crear";
+import Crear from "./crear/page";
 import { useEffect, useState } from "react";
 //import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
