@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:3000/api/plantillas";
+const API = "http://localhost:3001/api/plantillas";
 
 export function getPlantillasRequest() {
   return axios.get(`${API}`);

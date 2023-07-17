@@ -1,4 +1,5 @@
 "use client";
+import { getSingleOpcionesRequest } from "@/api/OpcionesApi";
 import {
   TextField,
   Paper,
@@ -17,54 +18,61 @@ const Respuesta = ({
   tipoRespuesta,
   valoracion,
   comentario,
+  enunciadoComentario,
   textoComentario,
   onChange,
 }: any) => {
-  const [arreglo, setArreglo] = useState<number[]>([]);
-  let arregloTemp: number[] = new Array();
+  const [opcionesState, setOpcionesState] = useState([]);
+
+  const getOpciones = async () => {
+    const response = await getSingleOpcionesRequest(tipoRespuesta);
+    if (Array.isArray(response.data.opciones)) {
+      setOpcionesState(response.data.opciones);
+    }
+    console.log(opcionesState);
+  };
 
   useEffect(() => {
-    for (let i = 0; i < tipoRespuesta; i++) {
-      arregloTemp.push(i);
-    }
-    setArreglo(arregloTemp);
-    console.log(arreglo);
+    getOpciones();
   }, []);
 
   return (
     <Paper elevation={4} style={{ padding: "30px 20px", borderRadius: "12px" }}>
       <Grid item>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           {enunciado}
         </Typography>
       </Grid>
 
-      <Grid item>
-        <FormControl>
-          <FormLabel id="demo-controlled-radio-buttons-group">
-            valoracion
-          </FormLabel>
-          <RadioGroup
-            aria-labelledby="demo-controlled-radio-buttons-group"
-            name="valoracion"
-            value={valoracion}
-            onChange={onChange}
-          >
-            {arreglo.map((dato: any, index: number) => {
-              return (
-                <FormControlLabel
-                  key={index}
-                  value={dato}
-                  control={<Radio />}
-                  label={index + 1}
-                />
-              );
-            })}
-          </RadioGroup>
-        </FormControl>
-      </Grid>
-      {comentario && (
+      {opcionesState && (
         <Grid item>
+          <FormControl>
+            <RadioGroup
+              aria-labelledby="demo-controlled-radio-buttons-group"
+              name="valoracion"
+              value={valoracion}
+              onChange={onChange}
+            >
+              {opcionesState.map((dato: any, index: number) => {
+                return (
+                  <FormControlLabel
+                    key={index}
+                    value={dato.valor}
+                    control={<Radio />}
+                    label={dato.valor}
+                  />
+                );
+              })}
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      )}
+
+      {comentario == "true" && (
+        <Grid item>
+          <Typography variant="h6" gutterBottom>
+            {enunciadoComentario}
+          </Typography>
           <FormControl fullWidth>
             <TextField
               multiline

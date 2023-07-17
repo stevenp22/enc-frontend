@@ -8,12 +8,15 @@ import {
   Paper,
   FormControl,
   Stack,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { crearPlantillaRequest } from "@/api/PlantillasApi";
 import { useSnackbar } from "notistack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Questions from "@/components/Questions";
 import { motion } from "framer-motion";
+import { getEmpresasRequest } from "@/api/EmpresasApi";
 
 const Crear = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -24,34 +27,81 @@ const Crear = () => {
       {
         enunciado: "",
         tipoRespuesta: "",
+        enunciadoComentario: "",
         comentario: false,
+        tipo: "titulo",
       },
     ],
   });
   //const [addQuestion, setAddQuestion] = useState<any>([]);
+  const [empresas, setEmpresas] = useState([
+    {
+      nombre: "",
+    },
+  ]);
+
+  const getEmpresas = async () => {
+    const response = await getEmpresasRequest();
+    setEmpresas(response.data);
+  };
+
+  useEffect(() => {
+    getEmpresas();
+  }, []);
 
   const handleAddQuestion = (e: any, index: number) => {
-    const { name, value, checked } = e.target;
+    const { name, value } = e.target;
 
     const updateCampos = { ...form };
     updateCampos.preguntas[index] = {
       ...updateCampos.preguntas[index],
       [name]: value,
-      comentario: checked || false,
     };
 
     setForm(updateCampos);
   };
 
-  const addFields = () => {
+  const addFieldsQuestions = () => {
     setForm({
       ...form,
       preguntas: [
         ...(form.preguntas || []),
-        { enunciado: "", tipoRespuesta: "", comentario: false },
+        {
+          enunciado: "",
+          tipoRespuesta: "",
+          comentario: false,
+          enunciadoComentario: "",
+          tipo: "pregunta",
+        },
       ],
     });
   };
+
+  const addFieldsTittles = () => {
+    setForm({
+      ...form,
+      preguntas: [
+        ...(form.preguntas || []),
+        {
+          enunciado: "",
+          tipoRespuesta: "",
+          comentario: false,
+          enunciadoComentario: "",
+          tipo: "titulo",
+        },
+      ],
+    });
+  };
+
+  const eliminar = () => {
+    form.preguntas.pop();
+    setForm({
+      ...form,
+      preguntas: [
+        ...(form.preguntas || []),
+      ],
+    });
+  }
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -59,12 +109,6 @@ const Crear = () => {
       ...prevFormData,
       [name]: value,
     }));
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    console.log(form);
-    crearPlantillas(form);
   };
 
   const crearPlantillas = async (values: any) => {
@@ -83,6 +127,12 @@ const Crear = () => {
         });
       }
     }
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    console.log(form);
+    crearPlantillas(form);
   };
 
   return (
@@ -105,7 +155,7 @@ const Crear = () => {
               </Typography>
             </Grid>
 
-            <Grid item xs={11.5} sm={11.5} lg={5.5}>
+            <Grid item xs={11.5} sm={11.5} lg={5.7}>
               <FormControl fullWidth>
                 <TextField
                   multiline
@@ -117,26 +167,36 @@ const Crear = () => {
               </FormControl>
             </Grid>
 
-            <Grid item xs={11.5} sm={11.5} lg={5.5}>
+            <Grid item xs={11.5} sm={11.5} lg={5.7}>
               <FormControl fullWidth>
                 <TextField
-                  multiline
                   placeholder="empresa"
+                  id="empresa"
+                  label="empresa"
+                  onChange={handleChange}
                   name="empresa"
                   value={form.empresa}
-                  onChange={handleChange}
-                />
+                  select
+                >
+                  {empresas.map((empresa, index) => (
+                    <MenuItem value={empresa.nombre} key={index}>
+                      {empresa.nombre}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </FormControl>
             </Grid>
 
             {form.preguntas.map((question: any, index: number) => {
               return (
-                <Grid item xs={11.5} sm={11.5} lg={5.5} key={index}>
+                <Grid item xs={11.5} sm={11.5} key={index}>
                   <FormControl fullWidth>
                     <Questions
                       enunciado={question.enunciado}
                       tipoRespuesta={question.tipoRespuesta}
                       comentario={question.comentario}
+                      enunciadoComentario={question.enunciadoComentario}
+                      tipo={question.tipo}
                       onChange={(e: any) => handleAddQuestion(e, index)}
                     />
                   </FormControl>
@@ -144,20 +204,38 @@ const Crear = () => {
               );
             })}
 
-            <Grid item xs={11} sm={11}>
+            <Grid item xs={11} sm={11.5}>
               <Stack spacing={2} direction="row">
-                <Button fullWidth type="submit" variant="contained">
-                  Guardar
+                <Button
+                  fullWidth
+                  color="inherit"
+                  variant="contained"
+                  onClick={addFieldsQuestions}
+                >
+                  Agregar pregunta
                 </Button>
                 <Button
                   fullWidth
                   color="inherit"
                   variant="contained"
-                  onClick={addFields}
+                  onClick={addFieldsTittles}
                 >
-                  Add Question
+                  Agregar titulo
+                </Button>
+                <Button
+                  fullWidth
+                  color="inherit"
+                  variant="contained"
+                  onClick={eliminar}
+                >
+                  Eliminar casilla
                 </Button>
               </Stack>
+            </Grid>
+            <Grid item xs={11} sm={11.5}>
+              <Button fullWidth type="submit" variant="contained">
+                Guardar
+              </Button>
             </Grid>
           </Grid>
         </form>

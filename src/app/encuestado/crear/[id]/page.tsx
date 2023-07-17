@@ -15,17 +15,23 @@ import { motion } from "framer-motion";
 import Respuesta from "@/components/Respuesta";
 import { getSinglePlantillaRequest } from "@/api/PlantillasApi";
 import { crearEncuestadoRequest } from "@/api/EncuestadoApi";
+import { useParams } from "next/navigation"
 
 const Crear = () => {
+  const params = useParams();
   const { enqueueSnackbar } = useSnackbar();
-  const [encuesta, setEncuesta] = useState({
+  const [encuestaState, setEncuestaState] = useState({
     nombre: "",
     empresa: "",
     preguntas: [
       {
         enunciado: "",
         tipoRespuesta: "",
-        comentario: false,
+        valoracion: "",
+        comentario: "",
+        enunciadoComentario: "",
+        textoComentario: "",
+        tipo: "",
       },
     ],
   });
@@ -40,16 +46,11 @@ const Crear = () => {
 
   const getEncuesta = async (id: any) => {
     const response = await getSinglePlantillaRequest(id);
-    setEncuesta(response.data);
-    setForm((prevFormData) => ({
-      ...prevFormData,
-      encuesta: encuesta.nombre,
-    }));
-    //console.log(encuesta);
+    setEncuestaState(response.data);
   };
 
   useEffect(() => {
-    getEncuesta("64a0cde77cfb6997f488b991");
+    getEncuesta(params.id);
   }, []);
 
   const handleAddRespuesta = (e: any, index: number) => {
@@ -68,6 +69,7 @@ const Crear = () => {
     const { name, value } = e.target;
     setForm((prevFormData) => ({
       ...prevFormData,
+      encuesta: encuestaState.nombre,
       [name]: value,
     }));
   };
@@ -93,7 +95,7 @@ const Crear = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log(form);
-    crearEncuestado(form);
+    //crearEncuestado(form);
   };
 
   return (
@@ -112,7 +114,7 @@ const Crear = () => {
           <Grid container spacing={3}>
             <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>
               <Typography variant="h6" gutterBottom>
-                {encuesta.nombre}
+                {encuestaState.nombre}
               </Typography>
             </Grid>
 
@@ -170,30 +172,32 @@ const Crear = () => {
               </FormControl>
             </Grid>
 
-            <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>
-              <Typography variant="h6" gutterBottom>
-                valoracion
-              </Typography>
-            </Grid>
-
-            {encuesta.preguntas.map((answer: any, index: number) => {
+            {encuestaState.preguntas.map((answer: any, index: number) => {
               return (
-                <Grid item xs={11.5} sm={11.5} lg={5.5} key={index}>
+                <Grid item xs={11.5} sm={11.5} key={index}>
                   <FormControl fullWidth>
-                    <Respuesta
+                    {answer.tipo == "titulo" && (
+                      <Typography variant="h4" gutterBottom style={{backgroundColor:"#c7c8ca"}}>
+                        {answer.enunciado}
+                      </Typography>
+                    )}
+                    {answer.tipo == "pregunta" && (
+                      <Respuesta
                       enunciado={answer.enunciado}
                       tipoRespuesta={answer.tipoRespuesta}
                       valoracion={answer.valoracion}
                       comentario={answer.comentario}
+                      enunciadoComentario={answer.enunciadoComentario}
                       textoComentario={answer.textoComentario}
                       onChange={(e: any) => handleAddRespuesta(e, index)}
                     />
+                    )}
                   </FormControl>
                 </Grid>
               );
             })}
-
-            <Grid item xs={11} sm={11}>
+            
+            <Grid item xs={11.5} sm={11.5}>
               <Stack spacing={2} direction="row">
                 <Button fullWidth type="submit" variant="contained">
                   Guardar

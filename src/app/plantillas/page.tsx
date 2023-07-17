@@ -14,7 +14,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  ToggleButton,
   Tooltip,
   Typography,
   Link as MuiLink,
@@ -25,9 +24,8 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import PropTypes, { element } from "prop-types";
 import { useTheme } from "@mui/material/styles";
-import Crear from "./crear/page";
 import { useEffect, useState } from "react";
-//import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import {
   getPlantillasRequest,
@@ -118,7 +116,7 @@ const Plantillas = () => {
     _id: "",
   });
   const [open, setOpen] = useState(false);
-  //const router = useRouter();
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -164,9 +162,9 @@ const Plantillas = () => {
   };
 
   interface plantillaInterface {
-    _id?: string,
-    nombre?: string,
-    empresa?: string,
+    _id: string,
+    nombre: string,
+    empresa: string,
   }
 
   useEffect(() => {
@@ -262,9 +260,7 @@ const Plantillas = () => {
                             <MuiLink>
                               <Button
                                 onClick={() =>
-                                  router.push({
-                                    pathname: `plantilla/${row._id}/editar`,
-                                  })
+                                  router.push(`encuestado/crear/${row._id}`)
                                 }
                               >
                                 <Edit sx={{ color: "#ffc327" }} />

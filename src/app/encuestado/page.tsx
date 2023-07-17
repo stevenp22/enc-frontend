@@ -1,4 +1,4 @@
-import Crear from "./crear"
+import Crear from "./crear/[id]/page"
 
 const Encuestado = () => {
   return(
