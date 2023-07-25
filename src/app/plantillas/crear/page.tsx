@@ -1,246 +1,81 @@
 "use client";
-import {
-  Grid,
-  Typography,
-  TextField,
-  Button,
-  Container,
-  Paper,
-  FormControl,
-  Stack,
-  Select,
-  MenuItem,
-} from "@mui/material";
-import { crearPlantillaRequest } from "@/api/PlantillasApi";
-import { useSnackbar } from "notistack";
-import { useEffect, useState } from "react";
-import Questions from "@/components/Questions";
-import { motion } from "framer-motion";
-import { getEmpresasRequest } from "@/api/EmpresasApi";
+import React, { useState } from "react";
+import Categoria, { CategoriaData } from "@/components/Categoria";
 
-const Crear = () => {
-  const { enqueueSnackbar } = useSnackbar();
-  const [form, setForm] = useState({
+const Crear: React.FC = () => {
+  const [formulario, setFormulario] = useState({
     nombre: "",
     empresa: "",
-    preguntas: [
-      {
-        enunciado: "",
-        tipoRespuesta: "",
-        enunciadoComentario: "",
-        comentario: false,
-        tipo: "titulo",
-      },
-    ],
+    tipo: "",
+    categorias: [] as CategoriaData[],
   });
-  //const [addQuestion, setAddQuestion] = useState<any>([]);
-  const [empresas, setEmpresas] = useState([
-    {
-      nombre: "",
-    },
-  ]);
 
-  const getEmpresas = async () => {
-    const response = await getEmpresasRequest();
-    setEmpresas(response.data);
-  };
-
-  useEffect(() => {
-    getEmpresas();
-  }, []);
-
-  const handleAddQuestion = (e: any, index: number) => {
-    const { name, value } = e.target;
-
-    const updateCampos = { ...form };
-    updateCampos.preguntas[index] = {
-      ...updateCampos.preguntas[index],
-      [name]: value,
-    };
-
-    setForm(updateCampos);
-  };
-
-  const addFieldsQuestions = () => {
-    setForm({
-      ...form,
-      preguntas: [
-        ...(form.preguntas || []),
-        {
-          enunciado: "",
-          tipoRespuesta: "",
-          comentario: false,
-          enunciadoComentario: "",
-          tipo: "pregunta",
-        },
-      ],
-    });
-  };
-
-  const addFieldsTittles = () => {
-    setForm({
-      ...form,
-      preguntas: [
-        ...(form.preguntas || []),
-        {
-          enunciado: "",
-          tipoRespuesta: "",
-          comentario: false,
-          enunciadoComentario: "",
-          tipo: "titulo",
-        },
-      ],
-    });
-  };
-
-  const eliminar = () => {
-    form.preguntas.pop();
-    setForm({
-      ...form,
-      preguntas: [
-        ...(form.preguntas || []),
-      ],
-    });
-  }
-
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setForm((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
+  const agregarCategoria = () => {
+    setFormulario((prevFormulario) => ({
+      ...prevFormulario,
+      categorias: [...prevFormulario.categorias, { nombre: "", preguntas: [] }],
     }));
   };
 
-  const crearPlantillas = async (values: any) => {
-    let response;
-    try {
-      response = await crearPlantillaRequest(values);
-      console.log(response);
-      response.data.statusCode == "200"
-        ? enqueueSnackbar(`${response.data.message}`, { variant: "warning" })
-        : enqueueSnackbar(`${response.data.message}`, { variant: "success" });
-      //router.push("/plantillas")
-    } catch (e) {
-      if (e == "Error: Request failed with status code 400") {
-        enqueueSnackbar("Problemas creando la plantilla, vuelva a intentar", {
-          variant: "warning",
-        });
-      }
-    }
+  const eliminarUltimaCategoria = () => {
+    setFormulario((prevFormulario) => {
+      const nuevasCategorias = [...prevFormulario.categorias];
+      nuevasCategorias.pop();
+      return {
+        ...prevFormulario,
+        categorias: nuevasCategorias,
+      };
+    });
   };
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    console.log(form);
-    crearPlantillas(form);
+  const guardarFormulario = () => {
+    // Aquí puedes hacer lo que necesites con los datos guardados
+    // Por ejemplo, enviarlos a un servidor o realizar alguna acción con ellos
+    console.log(formulario);
   };
 
   return (
-    <Container
-      maxWidth="xl"
-      component={motion.div}
-      initial={{ x: "30%" }}
-      animate={{ x: "0%" }}
-      style={{ marginTop: "30px" }}
-    >
-      <Paper
-        elevation={4}
-        style={{ padding: "30px 20px", borderRadius: "12px" }}
-      >
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>
-              <Typography variant="h6" gutterBottom>
-                Crear Plantilla
-              </Typography>
-            </Grid>
-
-            <Grid item xs={11.5} sm={11.5} lg={5.7}>
-              <FormControl fullWidth>
-                <TextField
-                  multiline
-                  placeholder="nombre"
-                  name="nombre"
-                  value={form.nombre}
-                  onChange={handleChange}
-                />
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={11.5} sm={11.5} lg={5.7}>
-              <FormControl fullWidth>
-                <TextField
-                  placeholder="empresa"
-                  id="empresa"
-                  label="empresa"
-                  onChange={handleChange}
-                  name="empresa"
-                  value={form.empresa}
-                  select
-                >
-                  {empresas.map((empresa, index) => (
-                    <MenuItem value={empresa.nombre} key={index}>
-                      {empresa.nombre}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </FormControl>
-            </Grid>
-
-            {form.preguntas.map((question: any, index: number) => {
-              return (
-                <Grid item xs={11.5} sm={11.5} key={index}>
-                  <FormControl fullWidth>
-                    <Questions
-                      enunciado={question.enunciado}
-                      tipoRespuesta={question.tipoRespuesta}
-                      comentario={question.comentario}
-                      enunciadoComentario={question.enunciadoComentario}
-                      tipo={question.tipo}
-                      onChange={(e: any) => handleAddQuestion(e, index)}
-                    />
-                  </FormControl>
-                </Grid>
-              );
-            })}
-
-            <Grid item xs={11} sm={11.5}>
-              <Stack spacing={2} direction="row">
-                <Button
-                  fullWidth
-                  color="inherit"
-                  variant="contained"
-                  onClick={addFieldsQuestions}
-                >
-                  Agregar pregunta
-                </Button>
-                <Button
-                  fullWidth
-                  color="inherit"
-                  variant="contained"
-                  onClick={addFieldsTittles}
-                >
-                  Agregar titulo
-                </Button>
-                <Button
-                  fullWidth
-                  color="inherit"
-                  variant="contained"
-                  onClick={eliminar}
-                >
-                  Eliminar casilla
-                </Button>
-              </Stack>
-            </Grid>
-            <Grid item xs={11} sm={11.5}>
-              <Button fullWidth type="submit" variant="contained">
-                Guardar
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
-    </Container>
+    <div>
+      <h1>Formulario</h1>
+      <div>
+        <label>Nombre:</label>
+        <input
+          type="text"
+          value={formulario.nombre}
+          onChange={(e) => setFormulario({ ...formulario, nombre: e.target.value })}
+        />
+      </div>
+      <div>
+        <label>Empresa:</label>
+        <input
+          type="text"
+          value={formulario.empresa}
+          onChange={(e) => setFormulario({ ...formulario, empresa: e.target.value })}
+        />
+      </div>
+      <div>
+        <label>Tipo:</label>
+        <input
+          type="text"
+          value={formulario.tipo}
+          onChange={(e) => setFormulario({ ...formulario, tipo: e.target.value })}
+        />
+      </div>
+      {formulario.categorias.map((categoria, index) => (
+        <Categoria
+          key={index}
+          categoria={categoria}
+          onChange={(nuevaCategoria) => {
+            const nuevasCategorias = [...formulario.categorias];
+            nuevasCategorias[index] = nuevaCategoria;
+            setFormulario({ ...formulario, categorias: nuevasCategorias });
+          }}
+        />
+      ))}
+      <button onClick={agregarCategoria}>Agregar Categoría</button>
+      <button onClick={eliminarUltimaCategoria}>Eliminar Última Categoría</button>
+      <button onClick={guardarFormulario}>Guardar</button>
+    </div>
   );
 };
 
