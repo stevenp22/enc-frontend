@@ -76,7 +76,7 @@ const Crear: React.FC = () => {
       response.data.statusCode == "200"
         ? enqueueSnackbar(`${response.data.message}`, { variant: "warning" })
         : enqueueSnackbar(`${response.data.message}`, { variant: "success" });
-        router.push(`plantillas`)
+        router.push(`/plantillas`)
     } catch (e) {
       if (e == "Error: Request failed with status code 400") {
         enqueueSnackbar("Problemas creando la plantilla, vuelva a intentar", {
