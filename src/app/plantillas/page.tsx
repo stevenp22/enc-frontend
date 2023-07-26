@@ -140,7 +140,6 @@ const Plantillas = () => {
   useEffect(() => {
     setLoading(false);
     getPlantillas();
-    console.log(data);
   }, []);
 
   const handleModal = () => {
@@ -165,6 +164,7 @@ const Plantillas = () => {
     _id: string,
     nombre: string,
     empresa: string,
+    tipo: string;
   }
 
   useEffect(() => {
@@ -230,6 +230,11 @@ const Plantillas = () => {
                       </TableCell>
                       <TableCell align="center">
                         <Typography sx={{ fontSize: "20px" }}>
+                          tipo
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography sx={{ fontSize: "20px" }}>
                           Acciones
                         </Typography>
                       </TableCell>
@@ -254,6 +259,9 @@ const Plantillas = () => {
                         </TableCell>
                         <TableCell align="center" component="th" scope="row">
                           {row.empresa}
+                        </TableCell>
+                        <TableCell align="center" component="th" scope="row">
+                          {row.tipo}
                         </TableCell>
                         <TableCell sx={{ width: "170px" }} align="center">
                           <Tooltip title="Editar">

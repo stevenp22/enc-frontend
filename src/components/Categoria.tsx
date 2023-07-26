@@ -1,5 +1,13 @@
 import React from "react";
 import Pregunta, { PreguntaData } from "./Pregunta";
+import {
+  Button,
+  FormControl,
+  Grid,
+  Paper,
+  Stack,
+  TextField,
+} from "@mui/material";
 
 export interface CategoriaData {
   nombre: string;
@@ -30,7 +38,10 @@ const Categoria: React.FC<CategoriaProps> = ({ categoria, onChange }) => {
       enunciadoComentario: "",
       comentario: "",
     };
-    onChange({ ...categoria, preguntas: [...categoria.preguntas, nuevaPregunta] });
+    onChange({
+      ...categoria,
+      preguntas: [...categoria.preguntas, nuevaPregunta],
+    });
   };
 
   const eliminarUltimaPregunta = () => {
@@ -40,21 +51,49 @@ const Categoria: React.FC<CategoriaProps> = ({ categoria, onChange }) => {
   };
 
   return (
-    <div>
-      <div>
-        <label>Nombre Categoría:</label>
-        <input type="text" value={categoria.nombre} onChange={handleNombreChange} />
-      </div>
+    <Paper elevation={4} style={{ margin: "30px 20px", borderRadius: "12px" }}>
+      <Grid item>
+        <FormControl fullWidth>
+          <TextField
+            multiline
+            name="nombre"
+            placeholder="Nombre Categoría"
+            label="Nombre Categoría"
+            value={categoria.nombre}
+            onChange={handleNombreChange}
+          />
+        </FormControl>
+      </Grid>
       {categoria.preguntas.map((pregunta, index) => (
         <Pregunta
           key={index}
           pregunta={pregunta}
-          onChange={(nuevaPregunta) => handlePreguntaChange(index, nuevaPregunta)}
+          onChange={(nuevaPregunta) =>
+            handlePreguntaChange(index, nuevaPregunta)
+          }
         />
       ))}
-      <button onClick={agregarPregunta}>Agregar Pregunta</button>
-      <button onClick={eliminarUltimaPregunta}>Eliminar Última Pregunta</button>
-    </div>
+      <Grid item xs={11} sm={11.5}>
+        <Stack spacing={2} direction="row">
+          <Button
+            fullWidth
+            color="inherit"
+            variant="contained"
+            onClick={agregarPregunta}
+          >
+            Agregar Pregunta
+          </Button>
+          <Button
+            fullWidth
+            color="inherit"
+            variant="contained"
+            onClick={eliminarUltimaPregunta}
+          >
+            Eliminar Última Pregunta
+          </Button>
+        </Stack>
+      </Grid>
+    </Paper>
   );
 };
 
