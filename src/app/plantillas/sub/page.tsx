@@ -26,21 +26,26 @@ const PlantillaPage: React.FC = () => {
   }, []);
 
   const handleGuardar = () => {
-    const subPlantilla = {
-      nombre: plantilla?.nombre || "",
-      empresa: plantilla?.empresa || "",
-      tipo: "Subplantilla",
-      categoriasSeleccionadas: {} as { [categoriaNombre: string]: Pregunta[] },
-    };
+    const categoriasSeleccionadas: Categoria[] = [];
 
     for (const categoria of plantilla?.categorias || []) {
       const preguntasCategoriaSeleccionadas = preguntasSeleccionadas.filter((pregunta) =>
         categoria.preguntas.includes(pregunta)
       );
       if (preguntasCategoriaSeleccionadas.length > 0) {
-        subPlantilla.categoriasSeleccionadas[categoria.nombre] = preguntasCategoriaSeleccionadas;
+        categoriasSeleccionadas.push({
+          nombre: categoria.nombre,
+          preguntas: preguntasCategoriaSeleccionadas,
+        });
       }
     }
+
+    const subPlantilla = {
+      nombre: plantilla?.nombre || "",
+      empresa: plantilla?.empresa || "",
+      tipo: "Subplantilla",
+      categoriasSeleccionadas,
+    };
 
     // Aquí puedes hacer algo con la subPlantilla, como guardarla en el backend.
     console.log(subPlantilla);
