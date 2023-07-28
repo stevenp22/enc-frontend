@@ -155,8 +155,8 @@ const Crear: React.FC = () => {
                   onChange={handleChange}
                   select
                 >
-                <MenuItem value={"maestra"}>Maestra</MenuItem>
-                <MenuItem value={"estandar"}>Estandar</MenuItem>
+                <MenuItem value={"Maestra"}>Maestra</MenuItem>
+                <MenuItem value={"Estandar"}>Estandar</MenuItem>
                 </TextField>
               </FormControl>
             </Grid>

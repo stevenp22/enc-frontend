@@ -34,7 +34,7 @@ import {
 import DeleteModal from "@/components/DeleteModal";
 import SearchBox from "@/components/SearchBox";
 import Link from "next/link";
-import { Add, Edit } from "@mui/icons-material";
+import { Add, Edit, BorderColor } from "@mui/icons-material";
 import { normalize } from "@/components/Utils";
 
 function TablePaginationActions(props: any) {
@@ -161,9 +161,9 @@ const Plantillas = () => {
   };
 
   interface plantillaInterface {
-    _id: string,
-    nombre: string,
-    empresa: string,
+    _id: string;
+    nombre: string;
+    empresa: string;
     tipo: string;
   }
 
@@ -229,9 +229,7 @@ const Plantillas = () => {
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
-                        <Typography sx={{ fontSize: "20px" }}>
-                          tipo
-                        </Typography>
+                        <Typography sx={{ fontSize: "20px" }}>tipo</Typography>
                       </TableCell>
                       <TableCell align="center">
                         <Typography sx={{ fontSize: "20px" }}>
@@ -275,6 +273,19 @@ const Plantillas = () => {
                               </Button>
                             </MuiLink>
                           </Tooltip>
+                          {row.tipo == "Maestra" && (
+                            <Tooltip title="Generar subplantilla">
+                              <MuiLink>
+                                <Button
+                                  onClick={() =>
+                                    router.push(`plantillas/sub/${row._id}`)
+                                  }
+                                >
+                                  <BorderColor sx={{ color: "#ffc327" }} />
+                                </Button>
+                              </MuiLink>
+                            </Tooltip>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

@@ -1,4 +1,5 @@
 import { Pregunta } from "../interfaces";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 interface PreguntaComponentProps {
   pregunta: Pregunta;
@@ -6,17 +7,13 @@ interface PreguntaComponentProps {
   onCheckChange: () => void;
 }
 
-const PreguntaComponent: React.FC<PreguntaComponentProps> = ({
-  pregunta,
-  isChecked,
-  onCheckChange,
-}) => {
+const PreguntaComponent: React.FC<PreguntaComponentProps> = ({ pregunta, isChecked, onCheckChange }) => {
   return (
     <div>
-      <label>
-        <input type="checkbox" checked={isChecked} onChange={onCheckChange} />
-        {pregunta.enunciado}
-      </label>
+      <FormControlLabel
+        control={<Checkbox checked={isChecked} onChange={onCheckChange} />}
+        label={pregunta.enunciado}
+      />
     </div>
   );
 };

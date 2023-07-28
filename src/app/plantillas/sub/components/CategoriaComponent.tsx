@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Categoria, Pregunta } from "../interfaces";
 import { PreguntaComponent } from "./PreguntaComponent";
+import { FormControlLabel, Checkbox, Box } from "@mui/material";
 
 interface CategoriaComponentProps {
   categoria: Categoria;
   preguntasSeleccionadas: Pregunta[];
-  setPreguntasSeleccionadas: (preguntas: Pregunta[]) => void;
+  setPreguntasSeleccionadas: (prevPreguntasSeleccionadas: Pregunta[]) => void;
 }
 
 const CategoriaComponent: React.FC<CategoriaComponentProps> = ({
@@ -25,24 +26,21 @@ const CategoriaComponent: React.FC<CategoriaComponentProps> = ({
 
   return (
     <div>
-      <label>
-        <input
-          type="checkbox"
-          checked={showPreguntas}
-          onChange={() => setShowPreguntas((prev) => !prev)}
-        />
-        {categoria.nombre}
-      </label>
+      <FormControlLabel
+        control={<Checkbox checked={showPreguntas} onChange={() => setShowPreguntas((prev) => !prev)} />}
+        label={categoria.nombre}
+      />
       {showPreguntas &&
         categoria.preguntas.map((pregunta, index) => (
-          <PreguntaComponent
-            key={index}
-            pregunta={pregunta}
-            isChecked={
-              preguntasSeleccionadas.find((p) => p.enunciado === pregunta.enunciado) !== undefined
-            }
-            onCheckChange={() => togglePreguntaSelection(pregunta)}
-          />
+          <Box key={index} ml={2}>
+            <PreguntaComponent
+              pregunta={pregunta}
+              isChecked={
+                preguntasSeleccionadas.find((p) => p.enunciado === pregunta.enunciado) !== undefined
+              }
+              onCheckChange={() => togglePreguntaSelection(pregunta)}
+            />
+          </Box>
         ))}
     </div>
   );
