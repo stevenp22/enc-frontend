@@ -15,26 +15,33 @@ import { motion } from "framer-motion";
 import Respuesta from "@/components/Respuesta";
 import { getSinglePlantillaRequest } from "@/api/PlantillasApi";
 import { crearEncuestadoRequest } from "@/api/EncuestadoApi";
-import { useParams } from "next/navigation"
+import { useParams } from "next/navigation";
 
 const Crear = () => {
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const [encuestaState, setEncuestaState] = useState({
     nombre: "",
     empresa: "",
-    preguntas: [
+    categorias: [
       {
-        enunciado: "",
-        tipoRespuesta: "",
-        valoracion: "",
-        comentario: "",
-        enunciadoComentario: "",
-        textoComentario: "",
-        tipo: "",
+        nombre: "",
+        preguntas: [
+          {
+            enunciado: "",
+            tipoRespuesta: "",
+            valoracion: "",
+            comentario: "",
+            enunciadoComentario: "",
+            textoComentario: "",
+            tipo: "",
+          },
+        ],
       },
     ],
   });
+
   const [form, setForm] = useState({
     encuesta: "",
     nombre: "",
@@ -51,7 +58,12 @@ const Crear = () => {
 
   useEffect(() => {
     getEncuesta(params.id);
-  }, []);
+    setLoading(false);
+  }, [params.id]);
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
 
   const handleAddRespuesta = (e: any, index: number) => {
     const { name, value } = e.target;
@@ -172,31 +184,37 @@ const Crear = () => {
               </FormControl>
             </Grid>
 
-            {encuestaState.preguntas.map((answer: any, index: number) => {
+            {encuestaState.categorias.map((categoria: any, index: number) => {
               return (
                 <Grid item xs={11.5} sm={11.5} key={index}>
                   <FormControl fullWidth>
-                    {answer.tipo == "titulo" && (
-                      <Typography variant="h4" gutterBottom style={{backgroundColor:"#c7c8ca"}}>
-                        {answer.enunciado}
-                      </Typography>
-                    )}
-                    {answer.tipo == "pregunta" && (
-                      <Respuesta
-                      enunciado={answer.enunciado}
-                      tipoRespuesta={answer.tipoRespuesta}
-                      valoracion={answer.valoracion}
-                      comentario={answer.comentario}
-                      enunciadoComentario={answer.enunciadoComentario}
-                      textoComentario={answer.textoComentario}
-                      onChange={(e: any) => handleAddRespuesta(e, index)}
-                    />
-                    )}
+                    <Typography
+                      variant="h4"
+                      gutterBottom
+                      style={{ backgroundColor: "#c7c8ca" }}
+                    >
+                      {categoria.nombre}
+                    </Typography>
+                    {categoria.preguntas.map((pregunta: any, index: number) => {
+                      return (
+                        <Grid item xs={11.5} sm={11.5} key={index}>
+                          <Respuesta
+                            enunciado={pregunta.enunciado}
+                            tipoRespuesta={pregunta.tipoRespuesta}
+                            valoracion={pregunta.valoracion}
+                            comentario={pregunta.comentario}
+                            enunciadoComentario={pregunta.enunciadoComentario}
+                            textoComentario={pregunta.textoComentario}
+                            onChange={(e: any) => handleAddRespuesta(e, index)}
+                          />
+                        </Grid>
+                      );
+                    })}
                   </FormControl>
                 </Grid>
               );
             })}
-            
+
             <Grid item xs={11.5} sm={11.5}>
               <Stack spacing={2} direction="row">
                 <Button fullWidth type="submit" variant="contained">
@@ -210,4 +228,5 @@ const Crear = () => {
     </Container>
   );
 };
+
 export default Crear;

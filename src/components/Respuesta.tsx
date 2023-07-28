@@ -1,4 +1,3 @@
-"use client";
 import { getSingleOpcionesRequest } from "@/api/OpcionesApi";
 import {
   TextField,
@@ -8,7 +7,6 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
-  FormLabel,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -22,6 +20,7 @@ const Respuesta = ({
   textoComentario,
   onChange,
 }: any) => {
+  const [loading, setLoading] = useState(true);
   const [opcionesState, setOpcionesState] = useState([]);
 
   const getOpciones = async () => {
@@ -29,12 +28,16 @@ const Respuesta = ({
     if (Array.isArray(response.data.opciones)) {
       setOpcionesState(response.data.opciones);
     }
-    console.log(opcionesState);
   };
 
   useEffect(() => {
     getOpciones();
-  }, []);
+    setLoading(false);
+  }, [loading]);
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <Paper elevation={4} style={{ padding: "30px 20px", borderRadius: "12px" }}>
@@ -52,6 +55,7 @@ const Respuesta = ({
               name="valoracion"
               value={valoracion}
               onChange={onChange}
+              row
             >
               {opcionesState.map((dato: any, index: number) => {
                 return (

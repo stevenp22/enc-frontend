@@ -266,7 +266,7 @@ const Plantillas = () => {
                             <MuiLink>
                               <Button
                                 onClick={() =>
-                                  router.push(`encuestado/crear/${row._id}`)
+                                  router.push(`encuestas/crear/${row._id}`)
                                 }
                               >
                                 <Edit sx={{ color: "#ffc327" }} />
