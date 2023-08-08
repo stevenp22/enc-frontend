@@ -24,6 +24,10 @@ const Crear = () => {
   const [encuestaState, setEncuestaState] = useState({
     nombre: "",
     empresa: "",
+    nombreEncuestado: "",
+    cargo: "",
+    razonSocial: "",
+    ciudad: "",
     categorias: [
       {
         nombre: "",
@@ -35,20 +39,10 @@ const Crear = () => {
             comentario: "",
             enunciadoComentario: "",
             textoComentario: "",
-            tipo: "",
           },
         ],
       },
     ],
-  });
-
-  const [form, setForm] = useState({
-    encuesta: "",
-    nombre: "",
-    cargo: "",
-    razonSocial: "",
-    ciudad: "",
-    respuestas: [{}],
   });
 
   const getEncuesta = async (id: any) => {
@@ -58,6 +52,7 @@ const Crear = () => {
 
   useEffect(() => {
     getEncuesta(params.id);
+
     setLoading(false);
   }, [params.id]);
 
@@ -65,23 +60,21 @@ const Crear = () => {
     return <div>Cargando...</div>;
   }
 
-  const handleAddRespuesta = (e: any, index: number) => {
+  const handleAddRespuesta = (e: any, indexCategoria: number, indexRespuesta: number) => {
     const { name, value } = e.target;
 
-    const updateCampos = { ...form };
-    updateCampos.respuestas[index] = {
-      ...updateCampos.respuestas[index],
+    const updateCampos = { ...encuestaState };
+    updateCampos.categorias[indexCategoria].preguntas[indexRespuesta] = {
+      ...updateCampos.categorias[indexCategoria].preguntas[indexRespuesta],
       [name]: value,
-    };
-
-    setForm(updateCampos);
+    }
+    setEncuestaState(updateCampos);
   };
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setForm((prevFormData) => ({
+    setEncuestaState((prevFormData) => ({
       ...prevFormData,
-      encuesta: encuestaState.nombre,
       [name]: value,
     }));
   };
@@ -90,11 +83,10 @@ const Crear = () => {
     let response;
     try {
       response = await crearEncuestadoRequest(values);
-      console.log(response);
+      //console.log(response);
       response.data.statusCode == "200"
         ? enqueueSnackbar(`${response.data.message}`, { variant: "warning" })
         : enqueueSnackbar(`${response.data.message}`, { variant: "success" });
-      //router.push("/plantillas")
     } catch (e) {
       if (e == "Error: Request failed with status code 400") {
         enqueueSnackbar("Problemas creando la plantilla, vuelva a intentar", {
@@ -106,8 +98,8 @@ const Crear = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    console.log(form);
-    //crearEncuestado(form);
+    //console.log(encuestaState);
+    crearEncuestado(encuestaState);
   };
 
   return (
@@ -140,9 +132,10 @@ const Crear = () => {
               <FormControl fullWidth>
                 <TextField
                   multiline
-                  placeholder="nombre"
-                  name="nombre"
-                  value={form.nombre}
+                  placeholder="Nombre"
+                  label="Nombre"
+                  name="nombreEncuestado"
+                  value={encuestaState.nombreEncuestado}
                   onChange={handleChange}
                 />
               </FormControl>
@@ -152,9 +145,10 @@ const Crear = () => {
               <FormControl fullWidth>
                 <TextField
                   multiline
-                  placeholder="cargo"
+                  placeholder="Cargo"
+                  label="Cargo"
                   name="cargo"
-                  value={form.cargo}
+                  value={encuestaState.cargo}
                   onChange={handleChange}
                 />
               </FormControl>
@@ -164,9 +158,10 @@ const Crear = () => {
               <FormControl fullWidth>
                 <TextField
                   multiline
-                  placeholder="razonSocial"
+                  placeholder="Razon Social"
+                  label="Razon Social"
                   name="razonSocial"
-                  value={form.razonSocial}
+                  value={encuestaState.razonSocial}
                   onChange={handleChange}
                 />
               </FormControl>
@@ -176,17 +171,18 @@ const Crear = () => {
               <FormControl fullWidth>
                 <TextField
                   multiline
-                  placeholder="ciudad"
+                  placeholder="Ciudad"
+                  label="Ciudad"
                   name="ciudad"
-                  value={form.ciudad}
+                  value={encuestaState.ciudad}
                   onChange={handleChange}
                 />
               </FormControl>
             </Grid>
 
-            {encuestaState.categorias.map((categoria: any, index: number) => {
+            {encuestaState.categorias.map((categoria: any, indexCategoria: number) => {
               return (
-                <Grid item xs={11.5} sm={11.5} key={index}>
+                <Grid item xs={11.5} sm={11.5} key={indexCategoria}>
                   <FormControl fullWidth>
                     <Typography
                       variant="h4"
@@ -195,9 +191,9 @@ const Crear = () => {
                     >
                       {categoria.nombre}
                     </Typography>
-                    {categoria.preguntas.map((pregunta: any, index: number) => {
+                    {categoria.preguntas.map((pregunta: any, indexRespuesta: number) => {
                       return (
-                        <Grid item xs={11.5} sm={11.5} key={index}>
+                        <Grid item xs={11.5} sm={11.5} key={indexRespuesta}>
                           <Respuesta
                             enunciado={pregunta.enunciado}
                             tipoRespuesta={pregunta.tipoRespuesta}
@@ -205,7 +201,7 @@ const Crear = () => {
                             comentario={pregunta.comentario}
                             enunciadoComentario={pregunta.enunciadoComentario}
                             textoComentario={pregunta.textoComentario}
-                            onChange={(e: any) => handleAddRespuesta(e, index)}
+                            onChange={(e: any) => handleAddRespuesta(e, indexCategoria, indexRespuesta)}
                           />
                         </Grid>
                       );

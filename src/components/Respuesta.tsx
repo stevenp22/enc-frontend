@@ -53,7 +53,7 @@ const Respuesta = ({
             <RadioGroup
               aria-labelledby="demo-controlled-radio-buttons-group"
               name="valoracion"
-              value={valoracion}
+              value={valoracion || ""}
               onChange={onChange}
               row
             >
@@ -61,7 +61,7 @@ const Respuesta = ({
                 return (
                   <FormControlLabel
                     key={index}
-                    value={dato.valor}
+                    value={dato.valor || ""}
                     control={<Radio />}
                     label={dato.valor}
                   />
@@ -84,6 +84,7 @@ const Respuesta = ({
               value={textoComentario}
               onChange={onChange}
               placeholder="Comentario"
+              label="Comentario"
             />
           </FormControl>
         </Grid>
