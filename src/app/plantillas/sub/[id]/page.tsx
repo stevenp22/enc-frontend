@@ -22,15 +22,11 @@ const PlantillaPage: React.FC = () => {
   const [nombrePlantilla, setNombrePlantilla] = useState<string>("");
 
   useEffect(() => {
-    // Aquí debes realizar la llamada a la API para obtener la plantilla.
-    // Supongamos que la API devuelve un objeto con la estructura de la interfaz Plantilla.
-
-    // Ejemplo de cómo recibir la respuesta de la API (debes ajustar esto según tu API):
     const obtenerPlantillaDesdeAPI = async () => {
       try {
         const response = await getSinglePlantillaRequest(params.id);
         setPlantilla(response.data);
-        setNombrePlantilla(response.data.nombre); // Establecemos el nombre de la plantilla inicialmente.
+        setNombrePlantilla(response.data.nombre);
       } catch (error) {
         console.error("Error al obtener la plantilla desde la API:", error);
       }

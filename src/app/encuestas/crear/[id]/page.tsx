@@ -28,6 +28,8 @@ const Crear = () => {
     cargo: "",
     razonSocial: "",
     ciudad: "",
+    createdAt: "",
+    updatedAt: "",
     categorias: [
       {
         nombre: "",
@@ -98,8 +100,9 @@ const Crear = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    //console.log(encuestaState);
-    crearEncuestado(encuestaState);
+    const { createdAt, updatedAt, ...updatedEncuestaState } = encuestaState;
+    console.log(updatedEncuestaState);
+    //crearEncuestado(encuestaState);
   };
 
   return (
