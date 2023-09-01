@@ -22,6 +22,7 @@ const Crear = () => {
   const params = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const [encuestaState, setEncuestaState] = useState({
+    _id: "",
     nombre: "",
     empresa: "",
     nombreEncuestado: "",
@@ -100,9 +101,9 @@ const Crear = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    const { createdAt, updatedAt, ...updatedEncuestaState } = encuestaState;
-    console.log(updatedEncuestaState);
-    //crearEncuestado(encuestaState);
+    const { _id, createdAt, updatedAt, ...updatedEncuestaState } = encuestaState;
+    //console.log(updatedEncuestaState);
+    crearEncuestado(updatedEncuestaState);
   };
 
   return (
