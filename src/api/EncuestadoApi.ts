@@ -15,3 +15,9 @@ export function getEncuestasRequest() {
 export function getSingleEncuestaRequest(id: any) {
   return axios.get(`${API}/${id}`);
 }
+
+export function buscarEncuestadosPorNombreRequest(nombre: string) {
+  return axios.post(`${API}/buscar-por-nombre`, { nombre }, {
+    headers: { "Content-Type": "application/json" },
+  });
+}

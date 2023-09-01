@@ -34,7 +34,7 @@ import {
 import DeleteModal from "@/components/DeleteModal";
 import SearchBox from "@/components/SearchBox";
 import Link from "next/link";
-import { Add, Edit, BorderColor } from "@mui/icons-material";
+import { Add, Edit, BorderColor, BarChart  } from "@mui/icons-material";
 import { normalize } from "@/components/Utils";
 
 function TablePaginationActions(props: any) {
@@ -286,6 +286,17 @@ const Plantillas = () => {
                               </MuiLink>
                             </Tooltip>
                           )}
+                          <Tooltip title="Graficos">
+                            <MuiLink>
+                              <Button
+                                onClick={() =>
+                                  router.push(`graficos/${row._id}`)
+                                }
+                              >
+                                <BarChart sx={{ color: "#ffc327" }} />
+                              </Button>
+                            </MuiLink>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     ))}
