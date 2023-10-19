@@ -203,7 +203,7 @@ import {
                     }}
                   >
                     <SearchBox value={value} updateValue={updateValue} />
-                    <MuiLink component={Link} href="/plantillas/crear">
+                    <MuiLink component={Link} href="/empresas/crear">
                       <Tooltip title="Añadir">
                         <Button sx={{ cursor: "pointer" }}>
                           <Add sx={{ color: "#15cb68", fontSize: "30px" }} />

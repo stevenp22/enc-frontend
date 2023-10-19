@@ -262,7 +262,7 @@ const Plantillas = () => {
                           {row.tipo}
                         </TableCell>
                         <TableCell sx={{ width: "170px" }} align="center">
-                          <Tooltip title="Editar">
+                          <Tooltip title="Responder">
                             <MuiLink>
                               <Button
                                 onClick={() =>

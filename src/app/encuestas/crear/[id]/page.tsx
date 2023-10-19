@@ -16,6 +16,7 @@ import Respuesta from "@/components/Respuesta";
 import { getSinglePlantillaRequest } from "@/api/PlantillasApi";
 import { crearEncuestadoRequest } from "@/api/EncuestadoApi";
 import { useParams } from "next/navigation";
+import CompartirButton from "@/components/CompartirButton";
 
 const Crear = () => {
   const [loading, setLoading] = useState(true);
@@ -118,6 +119,7 @@ const Crear = () => {
         elevation={4}
         style={{ padding: "30px 20px", borderRadius: "12px" }}
       >
+        <CompartirButton/>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>

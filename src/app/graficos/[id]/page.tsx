@@ -6,6 +6,7 @@ import { getSinglePlantillaRequest } from "@/api/PlantillasApi";
 import { useParams } from "next/navigation";
 import { getSingleOpcionesRequest } from "@/api/OpcionesApi";
 import { Grafico } from "../Grafico";
+import { Paper, Typography } from "@mui/material";
 
 const Page: React.FC = () => {
   const [encuestaState, setEncuestaState] = useState<Array<Encuesta>>([]);
@@ -15,6 +16,11 @@ const Page: React.FC = () => {
   const [dataFinal, setDataFinal] = useState<number[][]>([]);
   const [opcionesFinal, setOpcionesFinal] = useState<Opcion[][]>([]);
   const [enunciado, setEnunciado] = useState<string[]>([]);
+  const [estadoNps, setEstadoNps] = useState<Array<number>>([]);
+  const [estadoLealtad, setEstadoLealtad] = useState<Array<number>>([]);
+  const [estadoSatisfacción, setEstadoSatisfacción] = useState<Array<number>>(
+    []
+  );
 
   const getEncuestas = async (nombre: string) => {
     const response = await buscarEncuestadosPorNombreRequest(nombre);
@@ -31,11 +37,15 @@ const Page: React.FC = () => {
   }, [params.id]);
 
   useEffect(() => {
-    if (plantilla !== undefined) {getEncuestas(plantilla.nombre)};
+    if (plantilla !== undefined) {
+      getEncuestas(plantilla.nombre);
+    }
   }, [plantilla]);
 
   useEffect(() => {
-    if (encuestaState) {contadorEncuesta()};
+    if (encuestaState) {
+      contadorEncuesta();
+    }
     setLoading(false);
   }, [encuestaState]);
 
@@ -70,6 +80,7 @@ const Page: React.FC = () => {
     if (plantilla !== undefined) {
       const newOpcionesFinal: Opcion[][] = [];
       const newDataFinal: number[][] = [];
+      const satisfacionTemporal: number[][] = [];
       const newEnunciado: string[] = [];
       for (
         let categoriaIndex = 0;
@@ -106,9 +117,92 @@ const Page: React.FC = () => {
               );
             }
           }
+          if (categoria.nombre == "NPS") {
+            // Sumar los primeros 7 valores
+            const detractor = cantidadValoracionesIguales
+              .slice(0, 7)
+              .reduce((a, b) => a + b, 0);
+
+            // Sumar los valores 8 y 9
+            const neutro = cantidadValoracionesIguales
+              .slice(7, 9)
+              .reduce((a, b) => a + b, 0);
+
+            // Sumar los valores 10 y 11
+            const promotor = cantidadValoracionesIguales
+              .slice(9)
+              .reduce((a, b) => a + b, 0);
+
+            // Sumar todos los valores del array
+            const total = cantidadValoracionesIguales.reduce(
+              (a, b) => a + b,
+              0
+            );
+            // Restar el valor de promotor y detractor
+            const factor = promotor - detractor;
+            // Crear un nuevo arreglo con todas las variables
+            const npsTemporal: Array<number> = [
+              detractor,
+              neutro,
+              promotor,
+              total,
+              factor,
+            ];
+            setEstadoNps(npsTemporal);
+          }
+          if (categoria.nombre == "LEALTAD") {
+            // Sumar los valores 4 y 5
+            const factor = cantidadValoracionesIguales
+              .slice(4)
+              .reduce((a, b) => a + b, 0);
+
+            // Sumar todos los valores del array
+            const total = cantidadValoracionesIguales.reduce(
+              (a, b) => a + b,
+              0
+            );
+            const lealtadTemporal: Array<number> = [factor, total];
+            setEstadoLealtad(lealtadTemporal);
+          }
+          if (categoria.nombre == "SATISFACCIÓN") {
+            if (cantidadValoracionesIguales.length > 0) {
+              satisfacionTemporal.push([...cantidadValoracionesIguales]);
+            }
+          }
           if (cantidadValoracionesIguales.length > 0) {
             newDataFinal.push([...cantidadValoracionesIguales]);
           }
+        }
+        if (
+          satisfacionTemporal.length > 0 &&
+          categoria.nombre == "SATISFACCIÓN"
+        ) {
+          const sumaPosiciones3y4 = satisfacionTemporal
+            .slice(1)
+            .reduce(
+              (total, subarreglo) => total + subarreglo[3] + subarreglo[4],
+              0
+            );
+
+          const sumaTotal = satisfacionTemporal
+            .slice(1)
+            .reduce(
+              (total, subarreglo) =>
+                total + subarreglo.reduce((a, b) => a + b, 0),
+              0
+            );
+
+          const ISCreal = (sumaPosiciones3y4 / sumaTotal) * 100;
+
+          const primerArreglo = satisfacionTemporal[0];
+
+          const sumaPosiciones3y4General = primerArreglo[3] + primerArreglo[4];
+          const sumaTotalGeneral = primerArreglo.reduce((a, b) => a + b, 0);
+
+          const ISCpercibido =
+            (sumaPosiciones3y4General / sumaTotalGeneral) * 100;
+
+          setEstadoSatisfacción([ISCreal, ISCpercibido]);
         }
       }
       setOpcionesFinal(newOpcionesFinal);
@@ -133,6 +227,43 @@ const Page: React.FC = () => {
             opciones={opciones.map((opcion: Opcion) => opcion.valor)}
           />
         ))}
+      {estadoNps && (
+        <Paper elevation={3} style={{ padding: "16px" }}>
+          <Typography variant="h6">Nps</Typography>
+          <Typography variant="h6">
+            Detractor: {(estadoNps[0] / estadoNps[3]) * 100}%
+          </Typography>
+          <Typography variant="h6">
+            Neutro: {(estadoNps[1] / estadoNps[3]) * 100}%
+          </Typography>
+          <Typography variant="h6">
+            Promotor: {(estadoNps[2] / estadoNps[3]) * 100}%
+          </Typography>
+          <Typography variant="h6">Total: {estadoNps[3]}</Typography>
+          <Typography variant="h6">
+            Factor: {(estadoNps[4] / estadoNps[3]) * 100}%
+          </Typography>
+        </Paper>
+      )}
+      {estadoLealtad && (
+        <Paper elevation={3} style={{ padding: "16px" }}>
+          <Typography variant="h6">Lealtad</Typography>
+          <Typography variant="h6">
+            Factor: {(estadoLealtad[0] / estadoLealtad[1]) * 100}%
+          </Typography>
+        </Paper>
+      )}
+      {estadoSatisfacción && (
+        <Paper elevation={3} style={{ padding: "16px" }}>
+          <Typography variant="h6">Satisfacción</Typography>
+          <Typography variant="h6">
+            ISCreal: {estadoSatisfacción[0]}%
+          </Typography>
+          <Typography variant="h6">
+            ISCpercibido: {estadoSatisfacción[1]}%
+          </Typography>
+        </Paper>
+      )}
     </div>
   );
 };
