@@ -12,6 +12,14 @@ export function crearPlantillaRequest(values: any) {
   });
 }
 
+export function enviarImagenRequest(imagen: any) {
+  const formData = new FormData();
+  formData.append('imagen', imagen);
+  return axios.post(`${API}/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+}
+
 export function getSinglePlantillaRequest(id: any) {
   return axios.get(`${API}/${id}`);
 }

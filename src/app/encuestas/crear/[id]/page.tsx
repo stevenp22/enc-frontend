@@ -14,9 +14,13 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Respuesta from "@/components/Respuesta";
 import { getSinglePlantillaRequest } from "@/api/PlantillasApi";
-import { crearEncuestadoRequest } from "@/api/EncuestadoApi";
+import {
+  crearEncuestadoRequest,
+  getImagenesRequest,
+} from "@/api/EncuestadoApi";
 import { useParams } from "next/navigation";
 import CompartirButton from "@/components/CompartirButton";
+import Image from "next/image";
 
 const Crear = () => {
   const [loading, setLoading] = useState(true);
@@ -26,6 +30,7 @@ const Crear = () => {
     _id: "",
     nombre: "",
     empresa: "",
+    imagen: "",
     nombreEncuestado: "",
     cargo: "",
     razonSocial: "",
@@ -48,30 +53,51 @@ const Crear = () => {
       },
     ],
   });
+  const [imagenPreview, setImagenPreview] = useState(String);
 
   const getEncuesta = async (id: any) => {
     const response = await getSinglePlantillaRequest(id);
     setEncuestaState(response.data);
   };
 
+  const getImagen = async (id: any) => {
+    try {
+      const response = await getImagenesRequest(id);
+      const objectURL = URL.createObjectURL(response.data);
+      console.log(objectURL);
+      setImagenPreview(objectURL);
+    } catch (error) {
+      console.error("Error al crear el objeto URL:", error);
+    }
+  };
+
   useEffect(() => {
     getEncuesta(params.id);
-
     setLoading(false);
   }, [params.id]);
+
+  useEffect(() => {
+    if (encuestaState.imagen) {
+      getImagen(encuestaState.imagen);
+    }
+  }, [encuestaState.imagen]);
 
   if (loading) {
     return <div>Cargando...</div>;
   }
 
-  const handleAddRespuesta = (e: any, indexCategoria: number, indexRespuesta: number) => {
+  const handleAddRespuesta = (
+    e: any,
+    indexCategoria: number,
+    indexRespuesta: number
+  ) => {
     const { name, value } = e.target;
 
     const updateCampos = { ...encuestaState };
     updateCampos.categorias[indexCategoria].preguntas[indexRespuesta] = {
       ...updateCampos.categorias[indexCategoria].preguntas[indexRespuesta],
       [name]: value,
-    }
+    };
     setEncuestaState(updateCampos);
   };
 
@@ -102,7 +128,8 @@ const Crear = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    const { _id, createdAt, updatedAt, ...updatedEncuestaState } = encuestaState;
+    const { _id, createdAt, updatedAt, ...updatedEncuestaState } =
+      encuestaState;
     //console.log(updatedEncuestaState);
     crearEncuestado(updatedEncuestaState);
   };
@@ -119,7 +146,7 @@ const Crear = () => {
         elevation={4}
         style={{ padding: "30px 20px", borderRadius: "12px" }}
       >
-        <CompartirButton/>
+        <CompartirButton />
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>
@@ -133,6 +160,21 @@ const Crear = () => {
                 informacion personal
               </Typography>
             </Grid>
+
+            {imagenPreview ? (
+              <Grid item xs={11.5} sm={11.5} lg={5.5}>
+                <Image
+                  src={imagenPreview}
+                  alt="Imagen de encuesta"
+                  width={200}
+                  height={200}
+                />
+              </Grid>
+            ) : (
+              <Grid item xs={11.5} sm={11.5} lg={5.5}>
+                <Typography>Cargando imagen...</Typography>
+              </Grid>
+            )}
 
             <Grid item xs={11.5} sm={11.5} lg={5.5}>
               <FormControl fullWidth>
@@ -186,36 +228,48 @@ const Crear = () => {
               </FormControl>
             </Grid>
 
-            {encuestaState.categorias.map((categoria: any, indexCategoria: number) => {
-              return (
-                <Grid item xs={11.5} sm={11.5} key={indexCategoria}>
-                  <FormControl fullWidth>
-                    <Typography
-                      variant="h4"
-                      gutterBottom
-                      style={{ backgroundColor: "#c7c8ca" }}
-                    >
-                      {categoria.nombre}
-                    </Typography>
-                    {categoria.preguntas.map((pregunta: any, indexRespuesta: number) => {
-                      return (
-                        <Grid item xs={11.5} sm={11.5} key={indexRespuesta}>
-                          <Respuesta
-                            enunciado={pregunta.enunciado}
-                            tipoRespuesta={pregunta.tipoRespuesta}
-                            valoracion={pregunta.valoracion}
-                            comentario={pregunta.comentario}
-                            enunciadoComentario={pregunta.enunciadoComentario}
-                            textoComentario={pregunta.textoComentario}
-                            onChange={(e: any) => handleAddRespuesta(e, indexCategoria, indexRespuesta)}
-                          />
-                        </Grid>
-                      );
-                    })}
-                  </FormControl>
-                </Grid>
-              );
-            })}
+            {encuestaState.categorias.map(
+              (categoria: any, indexCategoria: number) => {
+                return (
+                  <Grid item xs={11.5} sm={11.5} key={indexCategoria}>
+                    <FormControl fullWidth>
+                      <Typography
+                        variant="h4"
+                        gutterBottom
+                        style={{ backgroundColor: "#c7c8ca" }}
+                      >
+                        {categoria.nombre}
+                      </Typography>
+                      {categoria.preguntas.map(
+                        (pregunta: any, indexRespuesta: number) => {
+                          return (
+                            <Grid item xs={11.5} sm={11.5} key={indexRespuesta}>
+                              <Respuesta
+                                enunciado={pregunta.enunciado}
+                                tipoRespuesta={pregunta.tipoRespuesta}
+                                valoracion={pregunta.valoracion}
+                                comentario={pregunta.comentario}
+                                enunciadoComentario={
+                                  pregunta.enunciadoComentario
+                                }
+                                textoComentario={pregunta.textoComentario}
+                                onChange={(e: any) =>
+                                  handleAddRespuesta(
+                                    e,
+                                    indexCategoria,
+                                    indexRespuesta
+                                  )
+                                }
+                              />
+                            </Grid>
+                          );
+                        }
+                      )}
+                    </FormControl>
+                  </Grid>
+                );
+              }
+            )}
 
             <Grid item xs={11.5} sm={11.5}>
               <Stack spacing={2} direction="row">

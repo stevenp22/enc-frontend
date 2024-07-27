@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Categoria, { CategoriaData } from "@/components/Categoria";
 import { getEmpresasRequest } from "@/api/EmpresasApi";
-import { crearPlantillaRequest } from "@/api/PlantillasApi";
+import { crearPlantillaRequest, enviarImagenRequest } from "@/api/PlantillasApi";
 import { useSnackbar } from "notistack";
 import {
   Button,
@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Crear: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -25,8 +26,11 @@ const Crear: React.FC = () => {
     nombre: "",
     empresa: "",
     tipo: "",
+    imagen: "",
     categorias: [] as CategoriaData[],
   });
+
+  const [imagenPreview, setImagenPreview] = useState(String);
 
   const [empresas, setEmpresas] = useState([
     {
@@ -69,14 +73,41 @@ const Crear: React.FC = () => {
     });
   };
 
+  const manejarCambio = (e: any) => {
+    if (e.target.files && e.target.files[0]) {
+      let img = e.target.files[0];
+      setImagenPreview(URL.createObjectURL(img));
+    }
+  };
+
+  const enviarImagen = async (imagen: any) => {
+    let response;
+    try {
+      response = await enviarImagenRequest(imagen);
+      console.log(response.data);
+      return response.data;
+    } catch (e) {
+      if (e == "Error: Request failed with status code 400") {
+        enqueueSnackbar("Problemas subiendo la imagen, vuelva a intentar", {
+          variant: "warning",
+        });
+      }
+    }
+  }
+
   const crearPlantillas = async (values: any) => {
     let response;
+    const imagenInput = document.getElementById('imagenInput') as HTMLInputElement;
+    if (imagenInput.files && imagenInput.files[0]) {
+      let filename = await enviarImagen(imagenInput.files[0]);
+      values.imagen = filename;
+    }
     try {
       response = await crearPlantillaRequest(values);
       response.data.statusCode == "200"
         ? enqueueSnackbar(`${response.data.message}`, { variant: "warning" })
         : enqueueSnackbar(`${response.data.message}`, { variant: "success" });
-        router.push(`/plantillas`)
+      router.push(`/plantillas`);
     } catch (e) {
       if (e == "Error: Request failed with status code 400") {
         enqueueSnackbar("Problemas creando la plantilla, vuelva a intentar", {
@@ -87,9 +118,8 @@ const Crear: React.FC = () => {
   };
 
   const guardarFormulario = (event: React.FormEvent) => {
-    // Aquí puedes hacer lo que necesites con los datos guardados
-    // Por ejemplo, enviarlos a un servidor o realizar alguna acción con ellos
     event.preventDefault();
+    
     crearPlantillas(formulario);
   };
 
@@ -155,11 +185,23 @@ const Crear: React.FC = () => {
                   onChange={handleChange}
                   select
                 >
-                <MenuItem value={"Maestra"}>Maestra</MenuItem>
-                <MenuItem value={"Estandar"}>Estandar</MenuItem>
+                  <MenuItem value={"Maestra"}>Maestra</MenuItem>
+                  <MenuItem value={"Estandar"}>Estandar</MenuItem>
                 </TextField>
               </FormControl>
             </Grid>
+            <Grid item xs={11.5} sm={11.5} lg={5.7}>
+              <FormControl fullWidth>
+                <input type="file" onChange={manejarCambio} accept="image/*" id="imagenInput" />
+              </FormControl>
+            </Grid>
+            {imagenPreview && (
+              <Grid item xs={11.5} sm={11.5} lg={5.7}>
+                <FormControl fullWidth>
+                  <Image src={imagenPreview} alt="imagen" width={200} height={200} />
+                </FormControl>
+              </Grid>
+            )}
             {formulario.categorias.map((categoria, index) => (
               <Grid item xs={11.5} sm={11.5} key={index}>
                 <FormControl fullWidth>

@@ -8,6 +8,10 @@ export function crearEncuestadoRequest(values: any) {
   });
 }
 
+export function getImagenesRequest(id: any) {
+  return axios.get(`${API}/upload/${id}`, {responseType: 'blob'});
+}
+
 export function getEncuestasRequest() {
   return axios.get(`${API}`);
 }
