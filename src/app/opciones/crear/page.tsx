@@ -11,11 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 const Crear = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
   const [form, setForm] = useState({
     nombre: "",
     opciones: [{ valor: "" }],
@@ -56,7 +58,7 @@ const Crear = () => {
       response.data.statusCode == "200"
         ? enqueueSnackbar(`${response.data.message}`, { variant: "warning" })
         : enqueueSnackbar(`${response.data.message}`, { variant: "success" });
-      //router.push("/plantillas")
+      router.push("/opciones")
     } catch (e) {
       if (e == "Error: Request failed with status code 400") {
         enqueueSnackbar("Problemas creando la plantilla, vuelva a intentar", {
@@ -131,7 +133,7 @@ const Crear = () => {
                   variant="contained"
                   onClick={addFields}
                 >
-                  Add Question
+                  Agregar campo
                 </Button>
               </Stack>
             </Grid>

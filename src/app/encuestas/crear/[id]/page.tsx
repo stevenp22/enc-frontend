@@ -8,6 +8,7 @@ import {
   Paper,
   FormControl,
   Stack,
+  Box,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
@@ -150,31 +151,35 @@ const Crear = () => {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h1" gutterBottom>
                 {encuestaState.nombre}
               </Typography>
             </Grid>
+
+            {imagenPreview ? (
+              <Grid item xs={12} sm={12} lg={12}>
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <Image
+                  src={imagenPreview}
+                  alt="Imagen de encuesta"
+                  layout="responsive"
+                  width={100}
+                  height={100}
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </Box>
+            </Grid>
+            ) : (
+              <Grid item xs={11.5} sm={11.5} lg={5.5}>
+                <Typography>Cargando imagen...</Typography>
+              </Grid>
+            )}
 
             <Grid item xs={11.5} sm={12} lg={12} sx={{ marginLeft: "20px" }}>
               <Typography variant="h6" gutterBottom>
                 informacion personal
               </Typography>
             </Grid>
-
-            {imagenPreview ? (
-              <Grid item xs={11.5} sm={11.5} lg={5.5}>
-                <Image
-                  src={imagenPreview}
-                  alt="Imagen de encuesta"
-                  width={200}
-                  height={200}
-                />
-              </Grid>
-            ) : (
-              <Grid item xs={11.5} sm={11.5} lg={5.5}>
-                <Typography>Cargando imagen...</Typography>
-              </Grid>
-            )}
 
             <Grid item xs={11.5} sm={11.5} lg={5.5}>
               <FormControl fullWidth>

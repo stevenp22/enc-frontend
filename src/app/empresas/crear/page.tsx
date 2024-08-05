@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 const Crear = () => {
@@ -1420,6 +1421,7 @@ const Crear = () => {
   ];
 
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
   const [form, setForm] = useState({
     nombre: "",
     nit: "",
@@ -1438,7 +1440,7 @@ const Crear = () => {
       response.data.statusCode == "200"
         ? enqueueSnackbar(`${response.data.message}`, { variant: "warning" })
         : enqueueSnackbar(`${response.data.message}`, { variant: "success" });
-      //router.push("/plantillas")
+      router.push("/empresas")
     } catch (e) {
       if (e == "Error: Request failed with status code 400") {
         enqueueSnackbar("Problemas creando la empresa, vuelva a intentar", {
